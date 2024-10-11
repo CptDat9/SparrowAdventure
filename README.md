@@ -4,7 +4,8 @@
 <div align="center">
 <img alt="GitHub code size in bytes" src="https://img.shields.io/github/languages/code-size/ppap-1264589/SparrowAdventure?labelColor=7AA2E3&color=97E7E1">
 </div>
-# Đây là phần code bài tập lớn OOP lớp thầy Trần Nhật Hóa
+
+## Đây là phần code bài tập lớn OOP lớp thầy Trần Nhật Hóa
 
 
 Để mang một bộ code về chạy thử trên Eclipse, thực hiện các bước sau:
@@ -40,3 +41,8 @@ Sau khi kết thúc bước 5, mình có thể chạy game khi mở file MainCla
 Chỉnh lại tham số này về giá trị 1.5f là được:
 
 ![Tham so SCALE](https://github.com/user-attachments/assets/74f7e8b1-9376-4e22-a2a3-1f77e9f999e2)
+
+
+https://www.youtube.com/watch?v=6_N8QZ47toY&list=PL4rzdwizLaxYmltJQRjq18a9gsSyEQQ-0
+Bộ code dự kiến cần phải hiểu đề bảo vệ bài tập lớn cuối kì:
+https://github.com/KaarinGaming/PlatformerTutorial/tree/ep29
