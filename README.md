@@ -43,6 +43,9 @@ Chỉnh lại tham số này về giá trị 1.5f là được:
 ![Tham so SCALE](https://github.com/user-attachments/assets/74f7e8b1-9376-4e22-a2a3-1f77e9f999e2)
 
 
+
 https://www.youtube.com/watch?v=6_N8QZ47toY&list=PL4rzdwizLaxYmltJQRjq18a9gsSyEQQ-0
+
 Bộ code dự kiến cần phải hiểu đề bảo vệ bài tập lớn cuối kì:
+
 https://github.com/KaarinGaming/PlatformerTutorial/tree/ep29
