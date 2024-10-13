@@ -10,7 +10,7 @@ import static utilz.Constants.UI.Buttons.*;
 
 public class MenuButton {
 	private int xPos, yPos, rowIndex, index;
-	private int xOffsetCenter = B_WIDTH / 2;
+	private int xOffsetCenter = B_WIDTH / 2; //pixel x tại vị trí chính giữa màn hình
 	private Gamestate state;
 	private BufferedImage[] imgs;
 	private boolean mouseOver, mousePressed;

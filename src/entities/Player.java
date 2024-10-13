@@ -37,7 +37,7 @@ public class Player extends Entity{
 	//PLAYER_STATE_ATTACKING
 	
 	//MOVING PARAMETERS
-	private float playerSpeed = 2.0f;
+	private float playerSpeed = 1.2f * Game.SCALE;
 	//MOVING PARAMETERS
 	
 	//CHECK COLLISION 
@@ -106,7 +106,7 @@ public class Player extends Entity{
 		
 //		System.out.println((int)(hitBox.x - xDrawOffset) + " " + (int)(hitBox.y - yDrawOffset) + " " + hitBox.x + " " + hitBox.y);
 		
-		drawHitbox(g, xlvlOffset);
+		drawHitbox(g);
 		/*
 		 * Bước 2: vẽ hitbox để debug
 		 * (hitbox.x, hitbox.y) ở chỗ nào thì vẽ hitbox debug ở chỗ đó (easy) 

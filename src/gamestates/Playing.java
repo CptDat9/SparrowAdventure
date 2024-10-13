@@ -154,14 +154,13 @@ public class Playing extends State implements Statemethods {
     }
 
     @Override
-    public void mouseMove(MouseEvent e) {
+    public void mouseMoved(MouseEvent e) {
 
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
         switch(e.getKeyCode()) {
-
             case KeyEvent.VK_A:
                 player.setLeft(true);
                 break;
@@ -188,7 +187,6 @@ public class Playing extends State implements Statemethods {
             case KeyEvent.VK_SPACE:
                 player.setJump(false);
                 break;
-
         }
     }
 }

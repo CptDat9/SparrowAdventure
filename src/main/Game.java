@@ -2,11 +2,9 @@ package main;
 
 import java.awt.Graphics;
 
-import entities.Player;
 import gamestates.Gamestate;
 import gamestates.Menu;
 import gamestates.Playing;
-import levels.LevelManager;
 
 public class Game implements Runnable{
 	private GameWindow gameWindow;
@@ -49,11 +47,7 @@ Thấp		|		nhân vật chạy nhanh		|		chạy thì chậm, 		|
 	public final static int GAME_HEIGHT = TILES_SIZE * TILES_IN_HEIGHT;
 	//CÁC HẰNG SỐ CHO CÁC TILES
 	
-	//SUBIMAGE SIZE
-	private int SUB_WIDTH = 64;
-	private int SUB_HEIGHT = 40;
-	//SUBIMAGE SIZE
-	
+
 	/*
 	 Ảnh của level được import gồm 26 ảnh theo chiều rộng, 14 ảnh theo chiều ngang
 	 chúng đều cùng kích thước 32*32
@@ -88,19 +82,22 @@ Thấp		|		nhân vật chạy nhanh		|		chạy thì chậm, 		|
 	}
 	
 	public void update() {
-
 		switch (Gamestate.state) {
-			case MENU:
-				menu.update();
-				break;
-			case PLAYING:
-				playing.update();
-				break;
+		case MENU:
+			menu.update();
+			break;
+		case PLAYING:
+			playing.update();
+			break;
+		case OPTIONS:
+		case QUIT:
+		default:
+			System.exit(0);
+			break;
 		}
 	}
 	
 	public void render(Graphics g) {
-
 		switch (Gamestate.state) {
 			case MENU:
 				menu.draw(g);
@@ -162,10 +159,10 @@ Thấp		|		nhân vật chạy nhanh		|		chạy thì chậm, 		|
 	}
 
 	public Menu getMenu() {
-		return  menu;
+		return menu;
 	}
 
 	public Playing getPlaying() {
-		return  playing;
+		return playing;
 	}
 }
