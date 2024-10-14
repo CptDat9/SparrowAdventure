@@ -3,9 +3,12 @@ package entities;
 
 import static utilz.Constants.PlayerConstants.*;
 import static utilz.HelpMethods.*;
-import java.awt.Graphics;
+
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
+import gamestates.Playing;
 import main.Game;
 import utilz.LoadSave;
 
@@ -37,7 +40,7 @@ public class Player extends Entity{
 	//PLAYER_STATE_ATTACKING
 	
 	//MOVING PARAMETERS
-	private float playerSpeed = 1.2f * Game.SCALE;
+	private float playerSpeed = 2.0f;
 	//MOVING PARAMETERS
 	
 	//CHECK COLLISION 
@@ -71,11 +74,56 @@ public class Player extends Entity{
 	// van toc roi xuong trong truong hop nhan vat nhay den cham noc
 	private boolean inAir = false;
 
-	public Player(float x, float y, int width, int height) {
+	//Thanh HP
+	private BufferedImage statusBarImg;
+
+	//AttackBox
+	private Rectangle2D.Float attackBox;
+	// Neu enemy trong tam danh nay thi enemies se chiu damage
+
+	private int statusBarWidth = (int)(192 * Game.SCALE);
+	private int statusBarHeight = (int)(58 * Game.SCALE);
+
+	private int statusBarX = (int)(10 * Game.SCALE);
+	private int statusBarY = (int)(10 * Game.SCALE);
+
+	private int healthBarWidth = (int)(150 * Game.SCALE);
+	private int healthBarHeight = (int)(4 * Game.SCALE);
+
+	private int healthBarXStart = (int)(34 * Game.SCALE);
+	private int healthBarYStart = (int)(14 * Game.SCALE);
+
+	private int maxHealth = 100;
+	private int currentHealth = maxHealth;
+	private int healthWidth = healthBarWidth;
+
+	private int flipX = 0;
+	private int flipW = 1;
+
+	//Co so cho y tuong lat anh
+	//chi can cho width thanh so am
+	// vi du gia su img ban dau co toa do trai tren la (x,y) co do dai width
+	// chi can doi width := -width
+	// thi no se lat nguoc lai anh giong khi minh soi img vao guong
+	// diem (x,y) luc nay se phai thanh toa do Phai Tren cua img
+	// con img se bi flip
+	// do vay flipX se de kiem soat toa do (x,y) la Trai tren hay Phai Tren
+	// con flipW la de dao dau cua width
+
+	private boolean attackChecked;
+	private Playing playing;
+	public Player(float x, float y, int width, int height, Playing playing) {
 		super(x, y, width, height);
+		this.playing = playing;
 		loadAnimations();
 		initHitbox(x, y, (int)(20 * Game.SCALE), (int)(27 * Game.SCALE)); 
 		//cast int để không bị lỗi collision liên tục với mặt đất hoặc bờ tường
+		initAttackBox();
+	}
+
+	private void initAttackBox() {
+		attackBox = new Rectangle2D.Float(x, y, (int)(20 * Game.SCALE), (int)(20 * Game.SCALE));
+
 	}
 	/*
 	 * Tư tưởng bây giờ, đó là vị trí (x, y) của nhân vật 
@@ -86,13 +134,50 @@ public class Player extends Entity{
 	
 	
 	public void update() {
+
+		/*if(currentHealth <= 0) {
+			playing.setGameOver(true);
+			return;
+		}*/
+
+		updateHealthBar();
+		updateAttackBox();
 		updatePos();
+		if(attacking)
+			checkAttack();
 		updateAnimationTick();
 		setAnimation();
 	}
-	
+
+	private void checkAttack() {
+		if(attackChecked || aniIndex != 1) //ani != 1 tuc la khong trong trang thai tan cong
+			return;
+		attackChecked = true;
+		playing.checkEnemyHit(attackBox);
+	}
+
+	private void updateAttackBox() {
+		// Khi di ve ben nao thi attackbox se o ben do ngay sat player
+		if(right) {
+			// Khi di ve ben phai thi attackbox cung di theo
+			attackBox.x = hitBox.x + hitBox.width + (int)(Game.SCALE * 10);
+		}
+		else if(left) {
+			attackBox.x = hitBox.x - hitBox.width - (int)(Game.SCALE * 10);
+		}
+		attackBox.y = hitBox.y + ((int)Game.SCALE * 10);
+	}
+
+	private void updateHealthBar() {
+		// Luong mau con lai ti le bao nhieu voi thanh mau ban dau
+		// de render cho can doi
+		healthWidth = (int)((float)healthBarWidth * currentHealth / maxHealth);
+
+
+	}
+
 	public void render(Graphics g, int xlvlOffset) {
-		g.drawImage(animations[playerAction][aniIndex], (int)(hitBox.x - xDrawOffset) - xlvlOffset, (int)(hitBox.y - yDrawOffset), width, height, null);
+		g.drawImage(animations[playerAction][aniIndex], (int)(hitBox.x - xDrawOffset) - xlvlOffset + flipX, (int)(hitBox.y - yDrawOffset) , width * flipW, height, null);
 		/*
 		 Bước 1: vẽ hoạt ảnh nhân vật
 		 Ta cần xác định vị trí bắt đầu vẽ hoạt ảnh từ trị ví của hitbox
@@ -106,12 +191,26 @@ public class Player extends Entity{
 		
 //		System.out.println((int)(hitBox.x - xDrawOffset) + " " + (int)(hitBox.y - yDrawOffset) + " " + hitBox.x + " " + hitBox.y);
 		
-		drawHitbox(g);
+		//drawHitbox(g, xlvlOffset);
 		/*
 		 * Bước 2: vẽ hitbox để debug
 		 * (hitbox.x, hitbox.y) ở chỗ nào thì vẽ hitbox debug ở chỗ đó (easy) 
 		 */
+		//drawAttackBox(g, xlvlOffset);
+		drawUI(g);
 	}
+
+	private void drawAttackBox(Graphics g, int xlvlOffset) {
+		g.setColor(Color.red);
+		g.drawRect((int)attackBox.x - xlvlOffset, (int)attackBox.y, (int)attackBox.width, (int)attackBox.height);
+	}
+
+	private void drawUI(Graphics g) {
+		g.drawImage(statusBarImg, statusBarX, statusBarY, statusBarWidth, statusBarHeight, null);
+		g.setColor(Color.red);
+		g.fillRect(healthBarXStart + statusBarX, healthBarYStart + statusBarY, healthWidth , healthBarHeight);
+	}
+
 
 	private void updateAnimationTick() {
 		++aniTick;
@@ -121,6 +220,7 @@ public class Player extends Entity{
 			if (aniIndex >= GetSpriteAmount(playerAction)) {
 				aniIndex = 0;
 				attacking = false;
+				attackChecked = false;
 				/*
 				 sau khi chạy hàm setAnimation, cho playerAction = ATTACK_1;
 				 hàm updatePos sẽ không có thao tác tương ứng cho ATTACK_1
@@ -149,7 +249,12 @@ public class Player extends Entity{
 		}
 		
 		if (attacking) {
-			playerAction = ATTACK_1;
+			playerAction = ATTACK;
+			if(startAni != ATTACK) {
+				aniIndex = 1;
+				aniTick = 0;
+				return;
+			}
 		}
 		
 		if (startAni != playerAction){
@@ -185,11 +290,16 @@ public class Player extends Entity{
 
 		float xSpeed = 0;
 		
-		if (left)
+		if (left) {
 			xSpeed -= playerSpeed;
-		else if (right)
+			flipX = width;
+			flipW = -1;
+		}
+		else if (right) {
 			xSpeed += playerSpeed;
-
+			flipX = 0;
+			flipW = 1;
+		}
 		if(!inAir) {
 			if(!IsEntityOnFloor(hitBox, lvlData)) {
 				// Truong hop dang di het duong va roi xuong bac duoi
@@ -248,9 +358,19 @@ public class Player extends Entity{
 		}
 	}
 
+	public void changeHealth(int value) {
+		currentHealth += value;
+		if(currentHealth <= 0) { //Health xuong nho hon 0;
+			currentHealth = 0;
+			//GameOver
+
+		}else if(currentHealth >= maxHealth) // Health qua luong mau toi da cho phep
+			currentHealth = maxHealth;
+	}
+
 	private void loadAnimations() {
 		BufferedImage img = LoadSave.GetSpriteAtlas(LoadSave.PLAYER_ATLAS);
-		animations = new BufferedImage[9][6]; //cac hoat anh la ma tran 9*6 nhu trong anh o resource
+		animations = new BufferedImage[7][8]; //cac hoat anh la ma tran 9*6 nhu trong anh o resource
 		for (int j = 0; j < animations.length; j++) {
 			for (int i = 0; i < animations[j].length; i++) {
 				animations[j][i] = img.getSubimage(i*SUB_WIDTH, j*SUB_HEIGHT, SUB_WIDTH, SUB_HEIGHT);
@@ -261,6 +381,8 @@ public class Player extends Entity{
 				 */
 			}
 		}
+
+		statusBarImg = LoadSave.GetSpriteAtlas(LoadSave.STATUS_BAR);
 	}
 	
 	public void loadLvlData(int[][] lvlData) {
@@ -311,5 +433,19 @@ public class Player extends Entity{
 
 	public void setJump(boolean jump) {
 		this.jump = jump;
+	}
+
+	public void resetAll() {
+		resetDirBooleans();
+		inAir = false;
+		attacking = false;
+		moving = false;
+		playerAction = IDLE;
+		currentHealth = maxHealth;
+		hitBox.x = x;
+		hitBox.y = y;
+
+		if(!IsEntityOnFloor(hitBox, lvlData))
+			inAir = true;
 	}
 }

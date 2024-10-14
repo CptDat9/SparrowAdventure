@@ -5,6 +5,7 @@ import utilz.LoadSave;
 import static utilz.Constants.EnemyConstants.*;
 
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ public class EnemyManager {
     }
 
     public void update(int[][] lvldata, Player player) {
-        for(Crabby c : crabbies) {
+        for(Crabby c : crabbies) if(c.isActive()) {
             c.update(lvldata, player);
         }
     }
@@ -35,9 +36,22 @@ public class EnemyManager {
     }
 
     private void drawCrabs(Graphics g, int xlvloffset) {
-        for(Crabby c : crabbies) {
-            g.drawImage(crabbyArr[c.getEnemyState()][c.getAniIndex()], (int) c.getHitbox().x - xlvloffset - CRABBY_DRAWOFFSET_X, (int) c.getHitbox().y - CRABBY_DRAWOFFSET_Y, CRABBY_WIDTH, CRABBY_HEIGHT, null);
+        for(Crabby c : crabbies) if(c.isActive()) {
+            g.drawImage(crabbyArr[c.getEnemyState()][c.getAniIndex()], (int) c.getHitbox().x - xlvloffset - CRABBY_DRAWOFFSET_X + c.flipX(), (int) c.getHitbox().y - CRABBY_DRAWOFFSET_Y, CRABBY_WIDTH * c.flipW(), CRABBY_HEIGHT, null);
+            //c.drawAttackBox(g, xlvloffset);
         }
+    }
+
+    public void checkEnemyHit(Rectangle2D.Float attackbox) {
+        for(Crabby c : crabbies)
+            if(c.isActive()) {
+                if (attackbox.intersects(c.getHitbox())) {
+                    c.hurt(10);
+                    return;
+                }
+            }
+
+
     }
 
     private void loadEnemyImgs() {
@@ -46,5 +60,10 @@ public class EnemyManager {
         for(int j = 0; j < crabbyArr.length; j++)
             for(int i = 0; i < crabbyArr[j].length; i++)
                 crabbyArr[j][i] = temp.getSubimage(i * CRABBY_WIDTH_DEFAULT, j * CRABBY_HEIGHT_DEFAULT, CRABBY_WIDTH_DEFAULT, CRABBY_HEIGHT_DEFAULT);
+    }
+
+    public void resetAllEnemies() {
+        for(Crabby c : crabbies)
+            c.resetEnemy();
     }
 }

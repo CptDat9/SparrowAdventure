@@ -9,6 +9,7 @@ import utilz.LoadSave;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.nio.FloatBuffer;
 import java.util.Random;
@@ -54,6 +55,7 @@ public class Playing extends State implements Statemethods {
     private BufferedImage backgroundImg, bigCloud, smallCloud;
     private int[] smallCloudsPos;
     private Random rnd = new Random();
+    private boolean gameOver = false;
 
     public Playing(Game game) {
         super(game);
@@ -70,7 +72,7 @@ public class Playing extends State implements Statemethods {
     private void initClasses(){
         levelManager = new LevelManager(game);
         enemyManager = new EnemyManager(this);
-        player = new Player(150, 150, (int)(64 * Game.SCALE), (int)(40 * Game.SCALE));
+        player = new Player(150, 150, (int)(64 * Game.SCALE), (int)(40 * Game.SCALE), this);
         player.loadLvlData(levelManager.getCurrentLevel().getLvlData());
     }
 
@@ -123,6 +125,7 @@ public class Playing extends State implements Statemethods {
         levelManager.draw(g, xLvlOffset);
         player.render(g, xLvlOffset);
         enemyManager.draw(g, xLvlOffset);
+
     }
 
     private void drawClouds(Graphics g) {
@@ -133,11 +136,27 @@ public class Playing extends State implements Statemethods {
         g.drawImage(smallCloud, SMALL_CLOUD_WIDTH * 4 * i - (int)(xLvlOffset * 0.7), smallCloudsPos[i], SMALL_CLOUD_WIDTH, SMALL_CLOUD_HEIGHT, null);
     }
 
+    public void resetAll() {
+        gameOver = false;
+        //paused = false;
+        player.resetAll();
+        enemyManager.resetAllEnemies();
+    }
+
+    public void setGameOver(boolean gameOver) {
+        this.gameOver = gameOver;
+    }
+
+    public void checkEnemyHit(Rectangle2D.Float attackBox) {
+        enemyManager.checkEnemyHit(attackBox);
+    }
+
     @Override
     public void mouseClicked(MouseEvent e) {
-        if (e.getButton() == MouseEvent.BUTTON1) {
+        if(!gameOver)
+            if (e.getButton() == MouseEvent.BUTTON1) {
             player.setAttack(true);
-        }
+            }
 		/*Nếu sự kiện bắt được là nút chuột trái thì
 		 nhân vật bắt đầu tấn công!
 		 */
@@ -161,6 +180,7 @@ public class Playing extends State implements Statemethods {
     @Override
     public void keyPressed(KeyEvent e) {
         switch(e.getKeyCode()) {
+
             case KeyEvent.VK_A:
                 player.setLeft(true);
                 break;
@@ -177,6 +197,7 @@ public class Playing extends State implements Statemethods {
 
     @Override
     public void keyReleased(KeyEvent e) {
+        if(gameOver) return;
         switch(e.getKeyCode()) {
             case KeyEvent.VK_A:
                 player.setLeft(false);
@@ -187,6 +208,7 @@ public class Playing extends State implements Statemethods {
             case KeyEvent.VK_SPACE:
                 player.setJump(false);
                 break;
+
         }
     }
 }
