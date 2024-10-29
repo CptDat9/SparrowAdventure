@@ -1,9 +1,8 @@
 package gamestates;
 
-import main.Game;
-
 public enum Gamestate {
-    PLAYING, MENU, OPTIONS, QUIT;
+	PLAYING, MENU, OPTIONS, QUIT, CREDITS, PLAYER_SELECTION;
+
     public static Gamestate state = MENU;
 }
 

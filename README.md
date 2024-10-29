@@ -18,15 +18,8 @@
   - Nguyễn Trung Hiếu
   - Nguyễn Hoài Phương
 
-## Người đóng góp 
-
-<div align="center">
-  <a href="https://github.com/ppap-1264589/SparrowAdventure/graphs/contributors">
-    <img src="https://contrib.rocks/image?repo=ppap-1264589/SparrowAdventure" />
-  </a>
-</div>
-
 ## Tính năng
+
 
 ## Cài đặt và triển khai
 

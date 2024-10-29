@@ -11,9 +11,6 @@ import utilz.LoadSave;
 import static utilz.Constants.UI.URMButtons.*;
 
 public class PauseOverlay {    // Lớp này đại diện cho giao diện tạm dừng trong trò chơi
-
-
-
     // biến lưu trạng thái trò chơi hiện tại (đang chơi)
     private Playing playing;
     
@@ -49,13 +46,17 @@ public class PauseOverlay {    // Lớp này đại diện cho giao diện tạm
         menuB = new UrmButton(menuX, bY, URM_SIZE, URM_SIZE, 2);
         replayB = new UrmButton(replayX, bY, URM_SIZE, URM_SIZE, 1);
         unpauseB = new UrmButton(unpauseX, bY, URM_SIZE, URM_SIZE, 0);
+        //Các nút menu, replay hay unpause có rowIndex để vẽ khác nhau là 2,1,0
     }
 
     // Phương thức tải hình nền từ tài nguyên
     private void loadBackground() {
-        backgroundImg = LoadSave.GetSpriteAtlas(LoadSave.PAUSE_BACKGROUND);
-        bgW = (int) (backgroundImg.getWidth() * Game.SCALE); // Tính chiều rộng
-        bgH = (int) (backgroundImg.getHeight() * Game.SCALE); // Tính chiều cao
+        backgroundImg = LoadSave.GetSpriteAtlas(LoadSave.PAUSE_BACKGROUND); //Tải qua hàm GetSpriteAtals, tên file là PAUSE_BACKGROUND được định nghĩa trong lớp LoadSave
+        
+        //Tính chiều cao, chiều rộng của hình cần vẽ ra màn hình
+        bgW = (int) (backgroundImg.getWidth() * Game.SCALE); 
+        bgH = (int) (backgroundImg.getHeight() * Game.SCALE); 
+        
         bgX = Game.GAME_WIDTH / 2 - bgW / 2; // Căn giữa hình nền theo chiều ngang
         bgY = (int) (25 * Game.SCALE); // Đặt vị trí y của hình nền
     }

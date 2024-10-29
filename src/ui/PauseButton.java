@@ -4,7 +4,7 @@ import java.awt.Rectangle;
 
 public class PauseButton {
 
-    protected int x, y, width, height;  // Các thuộc tính xác định vị trí và kích thước của nút
+    protected int x, y, width, height;  // Các thuộc tính xác định vị trí và kích thước của nút pause
     
     // Vùng (hình chữ nhật) để xác định kích thước và vùng bấm của nút
     protected Rectangle bounds;

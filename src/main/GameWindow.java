@@ -31,6 +31,11 @@ public class GameWindow {
 		có bên trong window		 
 		 */
 		
+		jframe.setLocationRelativeTo(null);
+		/*
+		 * Căn giữa màn hình phần gameplay
+		 */
+		
 		jframe.setVisible(true); //Hien thi window ra man hinh
 		
 		jframe.addWindowFocusListener(new WindowFocusListener() {

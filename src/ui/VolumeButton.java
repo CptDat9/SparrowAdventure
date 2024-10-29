@@ -13,16 +13,25 @@ public class VolumeButton extends PauseButton {
 	private boolean mouseOver, mousePressed;
 	private int buttonX, minX, maxX;
 	private float floatValue = 0f;
-// Constructor của volume button.
+	//Constructor của volume button.
+	/*
+	 * VOLUME_WIDTH là độ rộng của nút kéo thả
+	 */
 	public VolumeButton(int x, int y, int width, int height) {
-		super(x + width / 2, y, VOLUME_WIDTH, height); 	// Gọi constructor của PauseButton và căn giữa nút âm lượng
-		bounds.x -= VOLUME_WIDTH / 2; // Điều chỉnh vị trí biên để nút trượt căn giữa
-		buttonX = x + width / 2; // Xác định vị trí X ban đầu của nút trượt
-		this.x = x; // Lưu lại x ban đầu
-		this.width = width; // Lưu chiều rộng nút
+		super(x + width / 2, y, VOLUME_WIDTH, height); 	// Gọi constructor của PauseButton để căn giữa nút trượt và khởi tạo bounds.x của nó
+		bounds.x -= VOLUME_WIDTH / 2; // Setup vị trí bounds.x THỰC TẾ của nút trượt trên màn hình
+		buttonX = x + width / 2; // Xác định vị trí X của nút trượt (theo vị trí chính giữa)
+		/*
+		 * Sau khi truyền tham số x + width/2 và Volume_Width, x và width thật sự đã bị thay đổi
+		 * -> cần gán lại this.x = x và this.width = width
+		 */
+		this.x = x; // Lưu lại x ban đầu của thanh trượt
+		this.width = width; // Lưu chiều rộng của thanh trượt
+		
+		//Thiết lập giới hạn có thể kéo của nút trượt
 		minX = x + VOLUME_WIDTH / 2; 
 		maxX = x + width - VOLUME_WIDTH / 2;
-		/* Hai dòng ở trên để thiết lập giới hạn */
+		
 		loadImgs(); // Nạp tài nguyên
 	}
 // Phương thức tải hình ảnh của nút và thanh trượt (slider).
@@ -50,7 +59,7 @@ public class VolumeButton extends PauseButton {
 		// Vẽ thanh trượt (slider)
 		g.drawImage(slider, x, y, width, height, null);
 		// Vẽ nút âm lượng dựa trên trạng thái hiện tại
-		g.drawImage(imgs[index], buttonX - VOLUME_WIDTH / 2, y, VOLUME_WIDTH, height, null);
+		g.drawImage(imgs[index], bounds.x, y, VOLUME_WIDTH, height, null);
 	}
 
 	// Thay đổi vị trí X của nút trượt
@@ -59,7 +68,7 @@ public class VolumeButton extends PauseButton {
 		if (x < minX)
 			buttonX = minX;
 		else if (x > maxX)
-			buttonX = maxX;
+			buttonX = maxX;		//Đạt giới hạn kéo thả rồi thì vẫn set vị trí là minX (hoặc maxX)
 		else
 			buttonX = x;
 		// Cập nhật giá trị float đại diện cho mức âm lượng
@@ -79,6 +88,7 @@ public class VolumeButton extends PauseButton {
 	public void resetBools() {
 		mouseOver = false; // Reset trạng thái chuột di chuyển nhưng không ấn (hover)
 		mousePressed = false; // Reset trạng thái ấn chuột
+	}
 
 	// Kiểm tra xem chuột có di chuyển qua nút không
 	public boolean isMouseOver() {

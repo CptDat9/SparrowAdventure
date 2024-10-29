@@ -1,92 +1,72 @@
 package entities;
-import main.Game;
 
-import java.awt.*;
-import java.awt.geom.Rectangle2D;
-import java.util.stream.LongStream;
-
-import static utilz.Constants.Directions.LEFT;
-import static utilz.Constants.Directions.RIGHT;
 import static utilz.Constants.EnemyConstants.*;
-import static utilz.HelpMethods.*;
-import static utilz.Constants.Directions.*;
+import static utilz.HelpMethods.IsFloor;
+import static utilz.Constants.Dialogue.*;
 
-public class Crabby extends Enemy{
-    //AttackBox
-    private Rectangle2D.Float attackBox;
-    private int attackBoxOffsetX;
+import gamestates.Playing;
 
-    public Crabby(float x, float y) {
-        super(x, y, CRABBY_WIDTH, CRABBY_HEIGHT, CRABBY);
-        initHitbox(x, y, (int)(22 * Game.SCALE), (int)(19 * Game.SCALE));
-        initAttackBox();
-    }
+public class Crabby extends Enemy {
 
-    private void initAttackBox() {
-        attackBox = new Rectangle2D.Float(x, y, (int)(82 * Game.SCALE), (int)(19 * Game.SCALE));
-        attackBoxOffsetX = (int)(Game.SCALE * 30);
-    }
+	//(x, y) là vị trí mà Crabby spawn
+	public Crabby(float x, float y) {
+		super(x, y, CRABBY_WIDTH, CRABBY_HEIGHT, CRABBY);
+		
+		//Hitbox của Crabby là 22x19
+		initHitbox(22, 19);
+		
+		initAttackBox(82, 19, 30);
+	}
 
-    public void update(int[][] lvldata, Player player) {
-        updateBehavior(lvldata, player);
-        updateAnimationTick();
-        updateAttackBox();
-    }
+	public void update(int[][] lvlData, Playing playing) {
+		updateBehavior(lvlData, playing);
+		updateAnimationTick();
+		updateAttackBox();
+	}
 
-    private void updateAttackBox() {
-        attackBox.x = hitBox.x - attackBoxOffsetX;
-        attackBox.y = hitBox.y;
-    }
+	private void updateBehavior(int[][] lvlData, Playing playing) {
+		if (firstUpdate) firstUpdateCheck(lvlData);
 
-    private void updateBehavior(int[][] lvldata, Player player) {// Giong voi player
-        if(firstUpdate)
-            firstUpdateCheck(lvldata);
+		if (inAir) {
+			inAirChecks(lvlData, playing);
+		} else {
+			switch (state) {
+			case IDLE:
+				if (IsFloor(hitbox, lvlData))
+					newState(RUNNING);
+				else
+					inAir = true;
+				break;
+			case RUNNING:
+				//Chỉ khi nhìn thấy player mới turn_towards
+				//Không phải tự nhiên mà đang running lại turn_towards ngay
+				if (canSeePlayer(lvlData, playing.getPlayer())) {
+					turnTowardsPlayer(playing.getPlayer());
+					//Nếu đủ gần thì chiến luôn
+					if (isPlayerCloseForAttack(playing.getPlayer()))
+						newState(ATTACK);
+				}
+				move(lvlData);
 
-        if(inAir) {
-            updateInAir(lvldata);
-        }
-        else {
-            switch (enemyState) {
-                case IDLE:
-                    newState(RUNNING);
-                    break;
-                case RUNNING:
-                    if(canSeePlayer(lvldata, player))
-                        turnTowardsPlayer(player);
-                    if(isPlayerCloseforAttack(player))
-                        newState(ATTACK);
+				if (inAir)
+					playing.addDialogue((int) hitbox.x, (int) hitbox.y, EXCLAMATION);
 
-                    move(lvldata);
-                    break;
-                case ATTACK:
-                    if(aniIndex == 0)
-                        attackChecked = false;
-                    // Kiem tra attack chi kiem tra 1 lan va ta chon
-                    // animation thu aniIndex de kiem tra
-                    if(aniIndex == 3 && !attackChecked) {
-                        checkEnemyHit(attackBox, player);
-                    }
-                    break;
-                case HIT:
-                    break;
-            }
-        }
-
-    }
-
-    public void drawAttackBox(Graphics g, int xlvloffset) {
-        g.setColor(Color.red);
-        g.drawRect((int)attackBox.x - xlvloffset, (int)attackBox.y, (int)attackBox.width, (int)attackBox.height);
-    }
-
-    public int flipX() {
-        if(walkDir == RIGHT)
-            return width;
-        return 0;
-    }
-    public int flipW() {
-        if(walkDir == RIGHT) return -1;
-        return 1;
-    }
+				break;
+			case ATTACK:
+				if (aniIndex == 0)
+					attackChecked = false;
+				// Kiem tra attack chi kiem tra 1 lan va ta chon
+                // animation thu aniIndex de kiem tra
+				if (aniIndex == 3 && !attackChecked)
+					checkPlayerHit(attackBox, playing.getPlayer());
+				break;
+			case HIT:
+				if (aniIndex <= GetSpriteAmount(enemyType, state) - 2)
+					pushBack(pushBackDir, lvlData, 2f);
+				updatePushBackDrawOffset();
+				break;
+			}
+		}
+	}
 
 }

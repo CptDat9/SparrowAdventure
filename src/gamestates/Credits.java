@@ -27,6 +27,7 @@ public class Credits extends State implements Statemethods {
         loadEntities();
     }
 
+    //Nạp các Entities vào Credits
     private void loadEntities() {
         entitiesList = new ArrayList<>();
         entitiesList.add(new ShowEntity(getIdleAni(LoadSave.GetSpriteAtlas(LoadSave.PLAYER_PIRATE), 5, 64, 40), (int) (Game.GAME_WIDTH * 0.05), (int) (Game.GAME_HEIGHT * 0.8)));
