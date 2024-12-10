@@ -12,8 +12,7 @@ import levels.Level;
 import main.Game;
 import utilz.LoadSave;
 import static utilz.Constants.ObjectConstants.*;
-import static utilz.HelpMethods.CanCannonSeePlayer;
-import static utilz.HelpMethods.IsProjectileHittingLevel;
+import static utilz.HelpMethods.*;
 import static utilz.Constants.Projectiles.*;
 	
 public class ObjectManager {
@@ -25,7 +24,8 @@ public class ObjectManager {
 	private ArrayList<Potion> potions; // Danh sách các vật phẩm (potion) trong trò chơi
 	private ArrayList<GameContainer> containers; // Danh sách các thùng chứa (container) trong trò chơi
 	private ArrayList<Projectile> projectiles = new ArrayList<>(); // Danh sách các đạn pháo đang hoạt động
-
+	private BufferedImage[] shipImgs; //Hình ảnh cái thuyền
+	
 	private Level currentLevel; // Cấp độ hiện tại của trò chơi
 
 	// Constructor khởi tạo ObjectManager với tham chiếu đến trạng thái chơi hiện tại
@@ -131,6 +131,12 @@ public class ObjectManager {
 		grassImgs = new BufferedImage[2];
 		for (int i = 0; i < grassImgs.length; i++)
 			grassImgs[i] = grassTemp.getSubimage(32 * i, 0, 32, 32);
+		
+		BufferedImage shipTemp = LoadSave.GetSpriteAtlas(LoadSave.SHIP_ATLAS);
+		shipImgs = new BufferedImage[4];
+		for (int i = 0; i < shipImgs.length; i++)
+			shipImgs[i] = shipTemp.getSubimage(78 * i, 0, 78, 72);
+		
 	}
 	
 	// Cập nhật trạng thái của các đối tượng trong game
@@ -146,6 +152,7 @@ public class ObjectManager {
 
 		updateCannons(lvlData, player); // Cập nhật trạng thái pháo
 		updateProjectiles(lvlData, player); // Cập nhật trạng thái đạn pháo
+		updateShips();
 	}
 
 	// Cập nhật trạng thái cây nền
@@ -160,11 +167,16 @@ public class ObjectManager {
 			if (p.isActive()) { // Nếu đạn pháo đang hoạt động
 				p.updatePos(); // Cập nhật vị trí đạn
 				if (p.getHitbox().intersects(player.getHitbox())) { // Nếu đạn chạm vào người chơi
-					player.changeHealth(-25); // Gây sát thương cho người chơi
+					player.changeHealth(PROJECTILES_DAMAGE); // Gây sát thương cho người chơi
 					p.setActive(false); // Vô hiệu hóa đạn
 				} else if (IsProjectileHittingLevel(p, lvlData)) // Nếu đạn chạm vào địa hình
 					p.setActive(false); // Vô hiệu hóa đạn
 			}
+	}
+	
+	private void updateShips() {
+		for (Ship s : currentLevel.getShips())
+			s.update();
 	}
 
 	// Kiểm tra xem người chơi có trong phạm vi của pháo không
@@ -173,17 +185,21 @@ public class ObjectManager {
 		return absValue <= Game.TILES_SIZE * 5; // Nếu khoảng cách <= 5 ô gạch thì trả về true
 	}
 	
+	// Cần kiểm tra các điều kiện cơ bản để xem, quả pháo khi nào thì bắn? khi nào thì không bắn?
 	private void updateCannons(int[][] lvlData, Player player) {
 		for (Cannon c : currentLevel.getCannons()) {
 			if (!c.doAnimation)
 				if (c.getTileY() == player.getTileY())
 					if (isPlayerInRange(c, player))
 						if (isPlayerInfrontOfCannon(c, player))
-							if (CanCannonSeePlayer(lvlData, player.getHitbox(), c.getHitbox(), c.getTileY()))
+							if (CanCannonSeePlayer(lvlData, player.getHitbox(), c.getHitbox(), c.getTileY())) {
 								c.setAnimation(true);
-				c.update();
-			if (c.getAniIndex() == 4 && c.getAniTick() == 0)
+							}
+								
+			c.update();
+			if (c.getAniIndex() == 4 && c.getAniTick() == 0) {
 				shootCannon(c);
+			}
 		}
 	}
 
@@ -214,6 +230,7 @@ public class ObjectManager {
 		drawCannons(g, xLvlOffset); // Vẽ pháo
 		drawProjectiles(g, xLvlOffset); // Vẽ đạn pháo
 		drawGrass(g, xLvlOffset); //Vẽ cỏ
+		drawShips(g, xLvlOffset); //Vẽ thuyền
 	}
 	private void drawGrass(Graphics g, int xLvlOffset) {
     // Vẽ cỏ trên màn hình, với mỗi loại cỏ được xác định bởi type và vị trí được tính toán dựa trên offset
@@ -269,8 +286,10 @@ public class ObjectManager {
 	            if (gc.getObjType() == BARREL) // Nếu thùng chứa là barrel thì type = 1
 	                type = 1;
 	            // Vẽ thùng chứa với animation tương ứng
-	            g.drawImage(containerImgs[type][gc.getAniIndex()], (int) (gc.getHitbox().x - gc.getxDrawOffset() - xLvlOffset), (int) (gc.getHitbox().y - gc.getyDrawOffset()), CONTAINER_WIDTH,
-	                    CONTAINER_HEIGHT, null);
+	            g.drawImage(containerImgs[type][gc.getAniIndex()], 
+	            		(int) (gc.getHitbox().x - gc.getxDrawOffset() - xLvlOffset), 
+	            		(int) (gc.getHitbox().y - gc.getyDrawOffset()), 
+	            		CONTAINER_WIDTH, CONTAINER_HEIGHT, null);
 	        }
 	}
 	
@@ -286,6 +305,18 @@ public class ObjectManager {
 	                    null);
 	        }
 	}
+	
+	private void drawShips(Graphics g, int xLvlOffset) {
+	    // Vẽ các con thuyền (ships) trên màn hình
+	    for (Ship s : currentLevel.getShips())
+	        g.drawImage(shipImgs[s.getAniIndex()], 
+	        		(int) (s.getHitbox().x - xLvlOffset), 
+	        		(int) (s.getHitbox().y - s.getyDrawOffset() + s.getShipHeightDelta()), 
+	        		SHIP_WIDTH, SHIP_HEIGHT, null);
+	    
+	    
+	}
+
 	
 	public void resetAllObjects() {
 	    // Đặt lại trạng thái của tất cả các đối tượng (vật phẩm, thùng chứa, pháo) về trạng thái ban đầu khi người chơi bắt đầu lại

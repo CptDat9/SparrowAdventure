@@ -1,8 +1,7 @@
 package objects;
 
-import static utilz.Constants.ANI_SPEED; // Import hằng số tốc độ hoạt ảnh (animation speed) từ lớp Constants
 import static utilz.Constants.ObjectConstants.*; // Import hằng số liên quan đến đối tượng từ lớp ObjectConstants
-
+import static utilz.Constants.ANI_SPEED;
 import java.awt.Color; 
 import java.awt.Graphics;
 import java.awt.geom.Rectangle2D; // Import cho hình chữ nhật 2D dùng cho hitbox
@@ -39,7 +38,7 @@ public class GameObject {
 					active = false;
 				} 
 				// Nếu là các loại súng, chỉ ngừng hoạt ảnh nhưng vẫn giữ đối tượng hoạt động
-				else if (objType == CANNON_LEFT || objType == CANNON_RIGHT)
+				else if (objType == CANNON_LEFT || objType == CANNON_RIGHT || objType == SHIP)
 					doAnimation = false;
 			}
 		}
@@ -67,7 +66,7 @@ public class GameObject {
 	// Vẽ hitbox lên màn hình với offset cấp độ x
 	public void drawHitbox(Graphics g, int xLvlOffset) {
 		g.setColor(Color.PINK); // Đặt màu hitbox là màu hồng
-		// Vẽ hitbox với tọa độ đã trừ đi xLvlOffset (để cân nhắc vị trí của màn hình trong game)
+//		 Vẽ hitbox với tọa độ đã trừ đi xLvlOffset (để cân nhắc vị trí của màn hình trong game)
 		g.drawRect((int) hitbox.x - xLvlOffset, (int) hitbox.y, (int) hitbox.width, (int) hitbox.height);
 	}
 

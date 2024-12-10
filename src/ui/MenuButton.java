@@ -108,7 +108,6 @@ public class MenuButton {
 	}
 
 	// Phương thức resetBools() sẽ reset trạng thái của nút về mặc định, tức là không hover và không nhấn chuột.
-
 	public void resetBools() {
 		mouseOver = false;
 		mousePressed = false;
@@ -116,7 +115,6 @@ public class MenuButton {
 
 	
 	// Phương thức getState() trả về trạng thái game mà nút này đại diện.
-	
 	public Gamestate getState() {
 		return state;
 	}

@@ -7,7 +7,6 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Random;
-import java.util.ArrayList;
 
 import entities.EnemyManager;
 import entities.Player;
@@ -21,11 +20,7 @@ import ui.LevelCompletedOverlay;
 import ui.PauseOverlay;
 import utilz.LoadSave;
 
-import effects.DialogueEffect;
-import effects.Rain;
-
 import static utilz.Constants.Environment.*;
-import static utilz.Constants.Dialogue.*;
 
 public class Playing extends State implements Statemethods {
 
@@ -37,7 +32,6 @@ public class Playing extends State implements Statemethods {
     private GameOverOverlay gameOverOverlay;
     private GameCompletedOverlay gameCompletedOverlay;
     private LevelCompletedOverlay levelCompletedOverlay;
-    private Rain rain;
     
     // Y tuong cho background moving khi lam map rong:
     // Do thuc te screen chi hien thi tu (0,0) - (Width, Height)
@@ -67,9 +61,7 @@ public class Playing extends State implements Statemethods {
     
     private int maxLvlOffsetX;
 
-    private BufferedImage backgroundImg, bigCloud, smallCloud, shipImgs[];
-    private BufferedImage[] questionImgs, exclamationImgs;
-    private ArrayList<DialogueEffect> dialogEffects = new ArrayList<>();
+    private BufferedImage backgroundImg, bigCloud, smallCloud;
 
     private int[] smallCloudsPos;
     private Random rnd = new Random();
@@ -78,7 +70,6 @@ public class Playing extends State implements Statemethods {
     private boolean lvlCompleted;
     private boolean gameCompleted;
     private boolean playerDying;
-    private boolean drawRain;
 
     // Ship will be decided to drawn here. It's just a cool addition to the game
     // for the first level. Hinting on that the player arrived with the boat.
@@ -90,9 +81,9 @@ public class Playing extends State implements Statemethods {
     // you want
     // it.
 
-    private boolean drawShip = true;
-    private int shipAni, shipTick, shipDir = 1;
-    private float shipHeightDelta, shipHeightChange = 0.05f * Game.SCALE;
+//    private boolean drawShip = true;
+//    private int shipAni, shipTick, shipDir = 1;
+//    private float shipHeightDelta, shipHeightChange = 0.05f * Game.SCALE;
 
     public Playing(Game game) {
         super(game);
@@ -109,44 +100,13 @@ public class Playing extends State implements Statemethods {
         for (int i = 0; i < smallCloudsPos.length; i++)
             smallCloudsPos[i] = (int) (90 * Game.SCALE) + rnd.nextInt((int) (100 * Game.SCALE));
 
-        shipImgs = new BufferedImage[4];
-        BufferedImage temp = LoadSave.GetSpriteAtlas(LoadSave.SHIP);
-        for (int i = 0; i < shipImgs.length; i++)
-            shipImgs[i] = temp.getSubimage(i * 78, 0, 78, 72);
+//        shipImgs = new BufferedImage[4];
+//        BufferedImage temp = LoadSave.GetSpriteAtlas(LoadSave.SHIP_ATLAS);
+//        for (int i = 0; i < shipImgs.length; i++)
+//            shipImgs[i] = temp.getSubimage(i * 78, 0, 78, 72);
 
-        loadDialogue();
         calcLvlOffset();
         loadStartLevel();
-        setDrawRainBoolean();
-    }
-
-    private void loadDialogue() {
-        loadDialogueImgs();
-
-        // Load dialogue array with premade objects, that gets activated when needed.
-        // This is a simple
-        // way of avoiding ConcurrentModificationException error. (Adding to a list that
-        // is being looped through.
-
-        for (int i = 0; i < 10; i++)
-            dialogEffects.add(new DialogueEffect(0, 0, EXCLAMATION));
-        for (int i = 0; i < 10; i++)
-            dialogEffects.add(new DialogueEffect(0, 0, QUESTION));
-
-        for (DialogueEffect de : dialogEffects)
-            de.deactive();
-    }
-
-    private void loadDialogueImgs() {
-        BufferedImage qtemp = LoadSave.GetSpriteAtlas(LoadSave.QUESTION_ATLAS);
-        questionImgs = new BufferedImage[5];
-        for (int i = 0; i < questionImgs.length; i++)
-            questionImgs[i] = qtemp.getSubimage(i * 14, 0, 14, 12);
-
-        BufferedImage etemp = LoadSave.GetSpriteAtlas(LoadSave.EXCLAMATION_ATLAS);
-        exclamationImgs = new BufferedImage[5];
-        for (int i = 0; i < exclamationImgs.length; i++)
-            exclamationImgs[i] = etemp.getSubimage(i * 14, 0, 14, 12);
     }
 
     public void loadNextLevel() {
@@ -154,7 +114,6 @@ public class Playing extends State implements Statemethods {
         levelManager.loadNextLevel();
         player.setSpawn(levelManager.getCurrentLevel().getPlayerSpawn());
         resetAll();
-        drawShip = false;
     }
 
     private void loadStartLevel() {
@@ -175,8 +134,6 @@ public class Playing extends State implements Statemethods {
         gameOverOverlay = new GameOverOverlay(this);
         levelCompletedOverlay = new LevelCompletedOverlay(this);
         gameCompletedOverlay = new GameCompletedOverlay(this);
-
-        rain = new Rain();
     }
 
     public void setPlayerCharacter(PlayerCharacter pc) {
@@ -201,9 +158,7 @@ public class Playing extends State implements Statemethods {
         else { //Các trường hợp còn lại (khi game đang chạy), thì update các phần như levelManager, enemyManager
         	//Nếu update các lớp này thì có tác dụng gì?
         	//Sẽ gọi đến update các phần tương ứng trong một level: tình trạng vật lý của crabby, shark, ...
-            updateDialogue();
-            if (drawRain)
-                rain.update(xLvlOffset);
+            
             levelManager.update();
             objectManager.update(levelManager.getCurrentLevel().getLevelData(), player);
             player.update();
@@ -212,57 +167,8 @@ public class Playing extends State implements Statemethods {
             //Do đó, cần truyền tham số levelManager.currentLevelData vào hàm update
             enemyManager.update(levelManager.getCurrentLevel().getLevelData());
             checkCloseToBorder();
-            if (drawShip)
-                updateShipAni();
         }
     }
-
-    private void updateShipAni() {
-        shipTick++;
-        if (shipTick >= 35) {
-            shipTick = 0;
-            shipAni++;
-            if (shipAni >= 4)
-                shipAni = 0;
-        }
-
-        shipHeightDelta += shipHeightChange * shipDir;
-        shipHeightDelta = Math.max(Math.min(10 * Game.SCALE, shipHeightDelta), 0);
-
-        if (shipHeightDelta == 0)
-            shipDir = 1;
-        else if (shipHeightDelta == 10 * Game.SCALE)
-            shipDir = -1;
-
-    }
-
-    private void updateDialogue() {
-        for (DialogueEffect de : dialogEffects)
-            if (de.isActive())
-                de.update();
-    }
-
-    private void drawDialogue(Graphics g, int xLvlOffset) {
-        for (DialogueEffect de : dialogEffects)
-            if (de.isActive()) {
-                if (de.getType() == QUESTION)
-                    g.drawImage(questionImgs[de.getAniIndex()], de.getX() - xLvlOffset, de.getY(), DIALOGUE_WIDTH, DIALOGUE_HEIGHT, null);
-                else
-                    g.drawImage(exclamationImgs[de.getAniIndex()], de.getX() - xLvlOffset, de.getY(), DIALOGUE_WIDTH, DIALOGUE_HEIGHT, null);
-            }
-    }
-
-    public void addDialogue(int x, int y, int type) {
-        // Not adding a new one, we are recycling. #ThinkGreen lol
-        dialogEffects.add(new DialogueEffect(x, y - (int) (Game.SCALE * 15), type));
-        for (DialogueEffect de : dialogEffects)
-            if (!de.isActive())
-                if (de.getType() == type) {
-                    de.reset(x, -(int) (Game.SCALE * 15));
-                    return;
-                }
-    }
-
 
     /*
      Để làm được Bigger Level, có moving level, phải có một giá trị xLvlOffset
@@ -303,21 +209,15 @@ public class Playing extends State implements Statemethods {
         g.drawImage(backgroundImg, 0, 0, Game.GAME_WIDTH, Game.GAME_HEIGHT, null); //Vẽ BackGround
 
         drawClouds(g);
-        if (drawRain)
-            rain.draw(g, xLvlOffset);
-
-        if (drawShip)
-            g.drawImage(shipImgs[shipAni], (int) (100 * Game.SCALE) - xLvlOffset, (int) ((288 * Game.SCALE) + shipHeightDelta), (int) (78 * Game.SCALE), (int) (72 * Game.SCALE), null);
 
         //xLvlOffset là giá trị tính từ vị trí biên bên trái (của map), đến vị trí biên bên trái (đang vẽ trên màn hình)
-        //Đây chính là giá trị mà các hoạt ảnh liên quan đến lvl sẽ phải chạy lùi theos
+        //Đây chính là giá trị mà các hoạt ảnh liên quan đến lvl sẽ phải chạy lùi theo
         levelManager.draw(g, xLvlOffset);
         objectManager.draw(g, xLvlOffset);
         enemyManager.draw(g, xLvlOffset);
         player.render(g, xLvlOffset);
         objectManager.drawBackgroundTrees(g, xLvlOffset);
-        drawDialogue(g, xLvlOffset);
-
+        
         if (paused) { //Chỉ khi pause mới vẽ pauseOverlay
             g.setColor(new Color(0, 0, 0, 150));
             g.fillRect(0, 0, Game.GAME_WIDTH, Game.GAME_HEIGHT);
@@ -360,20 +260,10 @@ public class Playing extends State implements Statemethods {
         paused = false;
         lvlCompleted = false;
         playerDying = false;
-        drawRain = false;
-
-        setDrawRainBoolean();
 
         player.resetAll();
         enemyManager.resetAllEnemies();
         objectManager.resetAllObjects();
-        dialogEffects.clear();
-    }
-
-    private void setDrawRainBoolean() {
-        // This method makes it rain 20% of the time you load a level.
-        if (rnd.nextFloat() >= 0.8f)
-            drawRain = true;
     }
 
     public void setGameOver(boolean gameOver) {
@@ -421,7 +311,7 @@ public class Playing extends State implements Statemethods {
                     player.setRight(true);
                     break;
                 case KeyEvent.VK_SPACE:
-                    player.setJump(true);
+                    player.addJump(1);
                     break;
                 case KeyEvent.VK_ESCAPE: //Nhấn escape thì: đang dừng sẽ trở lại game
                     paused = !paused;
@@ -440,7 +330,6 @@ public class Playing extends State implements Statemethods {
                     player.setRight(false);
                     break;
                 case KeyEvent.VK_SPACE:
-                    player.setJump(false);
                     break;
             }
     }
@@ -487,6 +376,9 @@ public class Playing extends State implements Statemethods {
         else if (gameCompleted)
             gameCompletedOverlay.mouseMoved(e);
     }
+    /* Tùy theo trạng thái của Playing: gameOver, levelCompleted, paused, 
+     * thì mouseMoved, mouseReleased sẽ được hiểu theo các cách khác nhau
+     * */
 
     public void setLevelCompleted(boolean levelCompleted) {
         game.getAudioPlayer().lvlCompleted();

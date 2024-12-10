@@ -32,6 +32,8 @@ public class GameContainer extends GameObject {
 		}
 
 		// Điều chỉnh vị trí hitbox theo trục y và trục x dựa trên các giá trị lệch
+		// Cộng thêm 2 cho y thì mới chạm đất
+		// Cộng thêm offset/2 cho x thì mới căn giữa tile được
 		hitbox.y += yDrawOffset + (int) (Game.SCALE * 2); // Dịch chuyển hitbox theo trục y
 		hitbox.x += xDrawOffset / 2; // Dịch chuyển hitbox theo trục x
 	}

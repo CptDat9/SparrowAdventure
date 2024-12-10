@@ -21,6 +21,8 @@ public class PlayerSelection extends State implements Statemethods {
     private int playerIndex = 0;
 
     private CharacterAnimation[] characterAnimations;
+    
+    private int offsetSelection = 64;
 
 
     public PlayerSelection(Game game) {
@@ -37,9 +39,8 @@ public class PlayerSelection extends State implements Statemethods {
         characterAnimations = new CharacterAnimation[3];
         int i = 0;
         characterAnimations[i++] = new CharacterAnimation(PlayerCharacter.PIRATE);
-        characterAnimations[i++] = new CharacterAnimation(PlayerCharacter.ORC);
-        characterAnimations[i++] = new CharacterAnimation(PlayerCharacter.SOLDIER);
-
+        characterAnimations[i++] = new CharacterAnimation(PlayerCharacter.LABUBU);
+        characterAnimations[i++] = new CharacterAnimation(PlayerCharacter.CAPY);
     }
 
     private void loadBackground() {
@@ -75,10 +76,10 @@ public class PlayerSelection extends State implements Statemethods {
         drawChar(g, playerIndex, menuX + menuWidth / 2, menuY + menuHeight / 2);
 
         //Left
-        drawChar(g, playerIndex - 1, menuX, menuY + menuHeight / 2);
+        drawChar(g, playerIndex - 1, menuX - offsetSelection, menuY + menuHeight / 2);
 
-        //Left
-        drawChar(g, playerIndex + 1, menuX + menuWidth, menuY + menuHeight / 2);
+        //Right
+        drawChar(g, playerIndex + 1, menuX + menuWidth + offsetSelection, menuY + menuHeight / 2);
 
     }
 
@@ -104,10 +105,8 @@ public class PlayerSelection extends State implements Statemethods {
 
         if (isIn(e, playButton)) {
             if (playButton.isMousePressed()) {
-
                 game.getPlaying().setPlayerCharacter(characterAnimations[playerIndex].getPc());
                 game.getAudioPlayer().setLevelSong(game.getPlaying().getLevelManager().getLevelIndex());
-
                 playButton.applyGamestate();
             }
 

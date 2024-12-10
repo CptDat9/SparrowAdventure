@@ -12,7 +12,7 @@ import static utilz.Constants.EnemyConstants.*;
 public class EnemyManager {
 
 	private Playing playing;
-	private BufferedImage[][] crabbyArr, pinkstarArr, sharkArr;
+	private BufferedImage[][] crabbyArr, sharkArr;
 	private Level currentLevel;
 
 	public EnemyManager(Playing playing) {
@@ -27,17 +27,18 @@ public class EnemyManager {
 	//Update các tình trạng vật lý của Emeny
 	//Nếu không có nhân vật nào Active, sẽ gán gamestate là Completed
 	//Hàm update này cần phải detect được tình trạng hiện tại của map đang dùng, thì mới update thông tin vật lý một cách phù hợp
+	
+	/*
+	 * Khi update về hình ảnh, cũng như khi check xem có bị Player hit hay không, các con quái vật đều phải đảm bảo là
+	 * đang ở trong trạng thái active. Nếu không active, coi như con quái đó trong list<enemy> bị bỏ qua trong quá trình duyệt list
+	 * 
+	 * (Tóm lại: khi quái chết -> active = false -> coi như bị bỏ qua trong list)
+	 */
 	public void update(int[][] lvlData) {
 		boolean isAnyActive = false;
 		for (Crabby c : currentLevel.getCrabs())
 			if (c.isActive()) {
 				c.update(lvlData, playing);
-				isAnyActive = true;
-			}
-
-		for (Pinkstar p : currentLevel.getPinkstars())
-			if (p.isActive()) {
-				p.update(lvlData, playing);
 				isAnyActive = true;
 			}
 
@@ -55,35 +56,37 @@ public class EnemyManager {
 	// Các nhân vật này cũng có tọa độ vẽ lấy xLvlOffset làm mốc chuẩn
 	public void draw(Graphics g, int xLvlOffset) {
 		drawCrabs(g, xLvlOffset);
-		drawPinkstars(g, xLvlOffset);
 		drawSharks(g, xLvlOffset);
 	}
 
 	private void drawSharks(Graphics g, int xLvlOffset) {
 		for (Shark s : currentLevel.getSharks())
 			if (s.isActive()) {
-				g.drawImage(sharkArr[s.getState()][s.getAniIndex()], (int) s.getHitbox().x - xLvlOffset - SHARK_DRAWOFFSET_X + s.flipX(),
-						(int) s.getHitbox().y - SHARK_DRAWOFFSET_Y + (int) s.getPushDrawOffset(), SHARK_WIDTH * s.flipW(), SHARK_HEIGHT, null);
+				g.drawImage(sharkArr[s.getState()][s.getAniIndex()], 
+						(int) s.getHitbox().x - xLvlOffset - SHARK_DRAWOFFSET_X + s.flipX(),
+						(int) s.getHitbox().y - SHARK_DRAWOFFSET_Y + (int) s.getPushDrawOffset(), 
+						SHARK_WIDTH * s.flipW(), SHARK_HEIGHT, null);
 //				s.drawHitbox(g, xLvlOffset);
 //				s.drawAttackBox(g, xLvlOffset);
 			}
 	}
 
-	private void drawPinkstars(Graphics g, int xLvlOffset) {
-		for (Pinkstar p : currentLevel.getPinkstars())
-			if (p.isActive()) {
-				g.drawImage(pinkstarArr[p.getState()][p.getAniIndex()], (int) p.getHitbox().x - xLvlOffset - PINKSTAR_DRAWOFFSET_X + p.flipX(),
-						(int) p.getHitbox().y - PINKSTAR_DRAWOFFSET_Y + (int) p.getPushDrawOffset(), PINKSTAR_WIDTH * p.flipW(), PINKSTAR_HEIGHT, null);
-//				p.drawHitbox(g, xLvlOffset);
-			}
-	}
-
+	/*
+	 * Trường hợp 1:
+	 * Walkdir = RIGHT
+	 * -> Vẽ các hoạt ảnh Crabby NGƯỢC LẠI, bằng cách đặt flipX() = width của quái vật và flipW() = -1 để lật ngược ảnh vẽ của Crabby gốc
+	 * 
+	 * Trường hợp 2:
+	 * Walkdir = LEFT
+	 * -> Vẽ hoạt ảnh Crabby gốc là được
+	 */
 	private void drawCrabs(Graphics g, int xLvlOffset) {
 		for (Crabby c : currentLevel.getCrabs())
 			if (c.isActive()) {
-
-				g.drawImage(crabbyArr[c.getState()][c.getAniIndex()], (int) c.getHitbox().x - xLvlOffset - CRABBY_DRAWOFFSET_X + c.flipX(),
-						(int) c.getHitbox().y - CRABBY_DRAWOFFSET_Y + (int) c.getPushDrawOffset(), CRABBY_WIDTH * c.flipW(), CRABBY_HEIGHT, null);
+				g.drawImage(crabbyArr[c.getState()][c.getAniIndex()], 
+						(int) c.getHitbox().x - xLvlOffset - CRABBY_DRAWOFFSET_X + c.flipX(),
+						(int) c.getHitbox().y - CRABBY_DRAWOFFSET_Y + (int) c.getPushDrawOffset(), 
+						CRABBY_WIDTH * c.flipW(), CRABBY_HEIGHT, null);
 
 //				c.drawHitbox(g, xLvlOffset);
 //				c.drawAttackBox(g, xLvlOffset);
@@ -99,19 +102,6 @@ public class EnemyManager {
 						c.hurt(20);
 						return;
 					}
-
-		for (Pinkstar p : currentLevel.getPinkstars())
-			if (p.isActive()) {
-				if (p.getState() == ATTACK && p.getAniIndex() >= 3)
-					return;
-				else {
-					if (p.getState() != DEAD && p.getState() != HIT)
-						if (attackBox.intersects(p.getHitbox())) {
-							p.hurt(20);
-							return;
-						}
-				}
-			}
 
 		for (Shark s : currentLevel.getSharks())
 			if (s.isActive()) {
@@ -129,7 +119,6 @@ public class EnemyManager {
 	//Kích cỡ được nạp vào bảng crabbyArr[j][i] đúng bằng WIDTH_DEFAULT và HEIGHT_DEFAULT
 	private void loadEnemyImgs() {
 		crabbyArr = getImgArr(LoadSave.GetSpriteAtlas(LoadSave.CRABBY_SPRITE), 9, 5, CRABBY_WIDTH_DEFAULT, CRABBY_HEIGHT_DEFAULT);
-		pinkstarArr = getImgArr(LoadSave.GetSpriteAtlas(LoadSave.PINKSTAR_ATLAS), 8, 5, PINKSTAR_WIDTH_DEFAULT, PINKSTAR_HEIGHT_DEFAULT);
 		sharkArr = getImgArr(LoadSave.GetSpriteAtlas(LoadSave.SHARK_ATLAS), 8, 5, SHARK_WIDTH_DEFAULT, SHARK_HEIGHT_DEFAULT);
 	}
 
@@ -144,8 +133,6 @@ public class EnemyManager {
 	public void resetAllEnemies() {
 		for (Crabby c : currentLevel.getCrabs())
 			c.resetEnemy();
-		for (Pinkstar p : currentLevel.getPinkstars())
-			p.resetEnemy();
 		for (Shark s : currentLevel.getSharks())
 			s.resetEnemy();
 	}

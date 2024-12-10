@@ -12,7 +12,9 @@ import java.net.URL;
 import javax.imageio.ImageIO;
 
 public class LoadSave {
-    public static final String PLAYER_PIRATE = "player_sprites.png";
+    public static final String PLAYER_PIRATE = "player_pirate.png";
+    public static final String PLAYER_LABUBU = "player_labubu.png";
+    public static final String PLAYER_CAPY = "player_capy.png";
     public static final String PLAYER_ORC = "player_orc.png";
     public static final String PLAYER_SOLDIER = "player_soldier.png";
     public static final String LEVEL_ATLAS = "outside_sprites.png";
@@ -36,7 +38,6 @@ public class LoadSave {
     public static final String CANNON_BALL = "ball.png";
     public static final String DEATH_SCREEN = "death_screen.png";
     public static final String OPTIONS_MENU = "options_background.png";
-    public static final String PINKSTAR_ATLAS = "pinkstar_atlas.png";
     public static final String QUESTION_ATLAS = "question_atlas.png";
     public static final String EXCLAMATION_ATLAS = "exclamation_atlas.png";
     public static final String SHARK_ATLAS = "shark_atlas.png";
@@ -48,8 +49,8 @@ public class LoadSave {
     public static final String RAIN_PARTICLE = "rain_particle.png";
     public static final String WATER_TOP = "water_atlas_animation.png";
     public static final String WATER_BOTTOM = "water.png";
-    public static final String SHIP = "ship.png";
-
+    public static final String SHIP_ATLAS = "ship.png";
+    public static final String TREASURE_BG = "treasure_background.png";
 
     public static BufferedImage[][] loadAnimations(PlayerCharacter pc) {
         BufferedImage img = LoadSave.GetSpriteAtlas(pc.playerAtlas);
@@ -93,13 +94,18 @@ public class LoadSave {
         File[] files = file.listFiles();
         File[] filesSorted = new File[files.length];
 
-        for (int i = 0; i < filesSorted.length; i++)
-            for (int j = 0; j < files.length; j++) {
-                if (files[j].getName().equals((i + 1) + ".png"))
-                    filesSorted[i] = files[j];
-
-            }
-
+//        for (int i = 0; i < filesSorted.length; i++)
+//            for (int j = 0; j < files.length; j++) {
+//                if (files[j].getName().equals((i + 1) + ".png"))
+//                    filesSorted[i] = files[j];
+//
+//            }
+        filesSorted[0] = files[0];
+        filesSorted[1] = files[1];
+        filesSorted[2] = files[2];
+        filesSorted[3] = files[3];
+        filesSorted[4] = files[4];
+        
         BufferedImage[] imgs = new BufferedImage[filesSorted.length];
 
         for (int i = 0; i < imgs.length; i++)
@@ -111,4 +117,8 @@ public class LoadSave {
 
         return imgs;
     }
+    /*
+     * Các level được nạp vào phải được sorted.
+     * Lưu ý rằng, kích cỡ để tạo một level là 14 theo chiều dọc, tối thiểu 26 theo chiều rộng
+     */
 }

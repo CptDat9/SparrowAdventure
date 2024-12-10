@@ -50,7 +50,7 @@ public class Menu extends State implements Statemethods {
     private void loadButtons() {
         buttons[0] = new MenuButton(Game.GAME_WIDTH / 2, (int) (130 * Game.SCALE), 0, Gamestate.PLAYER_SELECTION);
         buttons[1] = new MenuButton(Game.GAME_WIDTH / 2, (int) (200 * Game.SCALE), 1, Gamestate.OPTIONS);
-        buttons[2] = new MenuButton(Game.GAME_WIDTH / 2, (int) (270 * Game.SCALE), 3, Gamestate.CREDITS);
+        buttons[2] = new MenuButton(Game.GAME_WIDTH / 2, (int) (270 * Game.SCALE), 3, Gamestate.PRE_CREDITS);
         buttons[3] = new MenuButton(Game.GAME_WIDTH / 2, (int) (340 * Game.SCALE), 2, Gamestate.QUIT);
     }
 
@@ -88,11 +88,6 @@ public class Menu extends State implements Statemethods {
             if (isIn(e, mb)) {
                 if (mb.isMousePressed())
                     mb.applyGamestate();
-            	/*
-            	 * Giả sử mình click vào nút xong lại kéo chuột ra bên ngoài nút
-            	 * Thì hệ thống sẽ không tính là mình "đã click"
-            	 * Chỉ coi là bấm nhầm và không thực hiện thêm thao tác
-            	 */
                 if (mb.getState() == Gamestate.PLAYING)
                     game.getAudioPlayer().setLevelSong(game.getPlaying().getLevelManager().getLevelIndex());
                 break;
@@ -101,6 +96,11 @@ public class Menu extends State implements Statemethods {
         }
         resetButtons(); //Release xong thì phải trả lại trạng thái cho nút
     }
+	/*
+	 * Giả sử mình click vào nút xong lại kéo chuột ra bên ngoài nút
+	 * Thì hệ thống sẽ không tính là mình "đã click"
+	 * Chỉ coi là bấm nhầm và không thực hiện thêm thao tác
+	 */
 
     private void resetButtons() {
         for (MenuButton mb : buttons)

@@ -20,13 +20,13 @@ public class GameCompletedOverlay {
     private BufferedImage img;
 	// Hình ảnh hiển thị khi trò chơi hoàn thành
     private MenuButton quit, credit; 
-	// Các nút "Quay lại menu" và "Thông tin tín dụng"
+	// Các nút "Quay lại menu" và "Credit"
     private int imgX, imgY, imgW, imgH; 
 	// Toạ độ và kích thước của hình ảnh
 
     /**
      * Hàm khởi tạo GameCompletedOverlay.
-     *   playing Tham chiếu đến đối tượng Playing, cho phép truy cập các phương thức và thuộc tính của nó.
+     *  playing Tham chiếu đến đối tượng Playing, cho phép truy cập các phương thức và thuộc tính của nó.
      */
     public GameCompletedOverlay(Playing playing) {
         this.playing = playing; // Gán tham chiếu đến trạng thái chơi
@@ -123,7 +123,7 @@ public class GameCompletedOverlay {
             if (credit.isMousePressed()) { // Nếu nút đã được nhấn
                 playing.resetAll(); // Đặt lại trạng thái chơi
                 playing.resetGameCompleted(); // Đặt lại trạng thái hoàn thành trò chơi
-                playing.setGamestate(Gamestate.CREDITS); // Chuyển đến trạng thái tín dụng
+                playing.setGamestate(Gamestate.CREDITS); // Chuyển đến trạng thái Credit
             }
         }
 

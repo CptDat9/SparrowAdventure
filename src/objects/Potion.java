@@ -21,6 +21,7 @@ public class Potion extends GameObject {
 		initHitbox(7, 14);
 
 		// Xác định độ lệch khi vẽ vật phẩm trên màn hình (theo tỷ lệ game)
+		// Khoảng cách giữa biên bên trên với vị trí thật của hoạt ảnh là 2, giữa biên bên phải với vị trí thật là 3
 		xDrawOffset = (int) (3 * Game.SCALE);
 		yDrawOffset = (int) (2 * Game.SCALE);
 

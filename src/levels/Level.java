@@ -6,7 +6,6 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import entities.Crabby;
-import entities.Pinkstar;
 import entities.Shark;
 import main.Game;
 import objects.BackgroundTree;
@@ -14,6 +13,7 @@ import objects.Cannon;
 import objects.GameContainer;
 import objects.Grass;
 import objects.Potion;
+import objects.Ship;
 import objects.Spike;
 
 import static utilz.Constants.EnemyConstants.*;
@@ -26,7 +26,6 @@ public class Level {
 
 	//Tập hợp các đối tượng có thể xuất hiện là một ArrayList có chung kiểu dữ liệu: có thể là Crabby, Shark,...
 	private ArrayList<Crabby> crabs = new ArrayList<>();
-	private ArrayList<Pinkstar> pinkstars = new ArrayList<>();
 	private ArrayList<Shark> sharks = new ArrayList<>();
 	private ArrayList<Potion> potions = new ArrayList<>();
 	private ArrayList<Spike> spikes = new ArrayList<>();
@@ -34,6 +33,7 @@ public class Level {
 	private ArrayList<Cannon> cannons = new ArrayList<>();
 	private ArrayList<BackgroundTree> trees = new ArrayList<>();
 	private ArrayList<Grass> grass = new ArrayList<>();
+	private ArrayList<Ship> ships = new ArrayList<>();
 
 	private int lvlTilesWide;
 	private int maxTilesOffset;
@@ -101,10 +101,10 @@ public class Level {
 	//Dựa theo màu của greenValue trong lvlData, mình sẽ biết rằng Enemy mình đang nạp vào là Enemy nào
 	//Nếu GreenValue == CRABBY(enum), thì vector ArrayList<Crabby> sẽ được add thêm một con crabby nữa 
 	//Cụ thể là được add ở cái tile có tọa độ (x, y) trong game
+	//100 -> PlayerSpawn
 	private void loadEntities(int greenValue, int x, int y) {
 		switch (greenValue) {
 			case CRABBY -> crabs.add(new Crabby(x * Game.TILES_SIZE, y * Game.TILES_SIZE));
-			case PINKSTAR -> pinkstars.add(new Pinkstar(x * Game.TILES_SIZE, y * Game.TILES_SIZE));
 			case SHARK -> sharks.add(new Shark(x * Game.TILES_SIZE, y * Game.TILES_SIZE));
 			case 100 -> playerSpawn = new Point(x * Game.TILES_SIZE, y * Game.TILES_SIZE);
 		}
@@ -113,11 +113,12 @@ public class Level {
 	
 	private void loadObjects(int blueValue, int x, int y) {
 		switch (blueValue) {
-		case RED_POTION, BLUE_POTION -> potions.add(new Potion(x * Game.TILES_SIZE, y * Game.TILES_SIZE, blueValue));
-		case BOX, BARREL -> containers.add(new GameContainer(x * Game.TILES_SIZE, y * Game.TILES_SIZE, blueValue));
-		case SPIKE -> spikes.add(new Spike(x * Game.TILES_SIZE, y * Game.TILES_SIZE, SPIKE));
-		case CANNON_LEFT, CANNON_RIGHT -> cannons.add(new Cannon(x * Game.TILES_SIZE, y * Game.TILES_SIZE, blueValue));
-		case TREE_ONE, TREE_TWO, TREE_THREE -> trees.add(new BackgroundTree(x * Game.TILES_SIZE, y * Game.TILES_SIZE, blueValue));
+			case RED_POTION, BLUE_POTION -> potions.add(new Potion(x * Game.TILES_SIZE, y * Game.TILES_SIZE, blueValue));
+			case BOX, BARREL -> containers.add(new GameContainer(x * Game.TILES_SIZE, y * Game.TILES_SIZE, blueValue));
+			case SPIKE -> spikes.add(new Spike(x * Game.TILES_SIZE, y * Game.TILES_SIZE, SPIKE));
+			case CANNON_LEFT, CANNON_RIGHT -> cannons.add(new Cannon(x * Game.TILES_SIZE, y * Game.TILES_SIZE, blueValue));
+			case TREE_ONE, TREE_TWO -> trees.add(new BackgroundTree(x * Game.TILES_SIZE, y * Game.TILES_SIZE, blueValue));
+			case SHIP -> ships.add(new Ship(x * Game.TILES_SIZE, y * Game.TILES_SIZE, blueValue));
 		}
 	}
 
@@ -180,10 +181,6 @@ public class Level {
 		return cannons;
 	}
 
-	public ArrayList<Pinkstar> getPinkstars() {
-		return pinkstars;
-	}
-
 	public ArrayList<BackgroundTree> getTrees() {
 		return trees;
 	}
@@ -192,4 +189,7 @@ public class Level {
 		return grass;
 	}
 
+	public ArrayList<Ship> getShips() {
+		return ships;
+	}
 }

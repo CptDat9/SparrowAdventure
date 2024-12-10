@@ -34,6 +34,7 @@ public class HelpMethods {
 		return IsTileSolid((int) xIndex, (int) yIndex, lvlData);
 	}
 
+	// isHittingLevel khi và chỉ khi BIÊN của quả bóng chạm vào tường 
 	public static boolean IsProjectileHittingLevel(Projectile p, int[][] lvlData) {
 		return IsSolid(p.getHitbox().x + p.getHitbox().width / 2, p.getHitbox().y + p.getHitbox().height / 2, lvlData);
 	}
@@ -218,3 +219,9 @@ public class HelpMethods {
 			return IsAllTilesWalkable(firstXTile, secondXTile, yTile, lvlData);
 	}
 }
+
+
+/*
+ * Đây là những hàm mà mình có thể dùng được ở bất cứ đâu!
+ * Nên được đặt trong một package riêng, một class riêng
+ */

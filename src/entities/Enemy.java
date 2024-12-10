@@ -21,7 +21,6 @@ public abstract class Enemy extends Entity {
     // Tam danh
     // player ma trong khoang nay cua enemy thi enemy se tan cong player
 	protected float attackDistance = Game.TILES_SIZE;
-
 	
 	protected boolean active = true;
 	protected boolean attackChecked;
@@ -37,6 +36,8 @@ public abstract class Enemy extends Entity {
 		walkSpeed = Game.SCALE * 0.5f;
 	}
 
+	
+	 //Tọa độ x của AttackBox thực sự được vẽ ra bằng tọa độ x của hitbox nhân vật ban đầu, trừ đi phần offset
 	protected void updateAttackBox() {
 		attackBox.x = hitbox.x - attackBoxOffsetX;
 		attackBox.y = hitbox.y;
@@ -155,10 +156,16 @@ public abstract class Enemy extends Entity {
 		return false;
 	}
 
+	/*
+	 * Quái vật nhận sát thương
+	 * Máu = 0 thì phát tín hiệu state hiện tại = DEAD
+	 * Máu khác 0 thì phát tín hiệu state hiện tại = HIT
+	 */
 	public void hurt(int amount) {
 		currentHealth -= amount;
-		if (currentHealth <= 0)
+		if (currentHealth <= 0) {
 			newState(DEAD);
+		}
 		else {
 			newState(HIT);
 			if (walkDir == LEFT)
@@ -181,38 +188,8 @@ public abstract class Enemy extends Entity {
 	}
 
 	//Lưu ý rằng updateAnimationTick của Player và của Enemy sẽ khác nhau
-	protected void updateAnimationTick() {
-		aniTick++;
-		if (aniTick >= ANI_SPEED) {
-			aniTick = 0;
-			aniIndex++;
-			if (aniIndex >= GetSpriteAmount(enemyType, state)) {
-				if (enemyType == CRABBY || enemyType == SHARK) {
-					aniIndex = 0;
-					
-					/*
-					 * Khi Enemy hoàn thành các animation của Attack, 
-					 * nó sẽ idle khoảng một lúc (cụ thể là đúng một loop cho animation idle)
-					 */
-					switch (state) {
-						case ATTACK, HIT -> state = IDLE;
-						case DEAD -> active = false;
-					}
-				} else if (enemyType == PINKSTAR) {
-					if (state == ATTACK)
-						aniIndex = 3;
-					else {
-						aniIndex = 0;
-						if (state == HIT) {
-							state = IDLE;
-
-						} else if (state == DEAD)
-							active = false;
-					}
-				}
-			}
-		}
-	}
+	//Các quái vật như Crabby, Shark, PinkStar sẽ Override hàm này, vì chúng có animation tick khác nhau
+	protected abstract void updateAnimationTick();
 
 	//Trường hợp kẻ địch đập vào tường thì phải quay ngược lại
 	protected void changeWalkDir() {
@@ -232,7 +209,6 @@ public abstract class Enemy extends Entity {
 		airSpeed = 0;
 
 		pushDrawOffset = 0;
-
 	}
 
 	public int flipX() {
