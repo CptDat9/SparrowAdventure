@@ -182,6 +182,10 @@ FPS\--------|-------------------------------|---------------------------|
     public Credits getCredits() {
         return credits;
     }
+    
+    public Precredits getPrecredits() {
+        return precredits;
+    }
 
     public PlayerSelection getPlayerSelection() {
         return playerSelection;

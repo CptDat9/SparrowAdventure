@@ -30,6 +30,7 @@ public class KeyBoardInputs implements KeyListener{
             case MENU -> gamePanel.getGame().getMenu().keyReleased(e);
             case PLAYING -> gamePanel.getGame().getPlaying().keyReleased(e);
             case CREDITS -> gamePanel.getGame().getCredits().keyReleased(e);
+            case PRE_CREDITS -> gamePanel.getGame().getPrecredits().keyReleased(e);
         }
     }
 
